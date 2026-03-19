@@ -1,17 +1,16 @@
 /*
  * このファイルの責務:
- * - タイトル表示とキャラクター / コース選択 UI を構築し、レース開始へ遷移する。
+ * - タイトル表示とキャラクター選択 UI を構築し、レース開始へ遷移する。
  * 依存している config / module:
- * - characterConfig.js, courseConfig.js, terrainUtils.js, characterFactory.js。
+ * - characterConfig.js, typeConfig.js, terrainUtils.js, characterFactory.js。
  * 将来どこを拡張する想定か:
- * - 複数 runner 選択、育成導線、詳細ステータス画面の追加。
+ * - 複数 runner 選択、コース選択、育成画面導線の追加。
  */
 import { CHARACTER_CONFIG } from '../config/characterConfig.js';
-import { COURSE_PRESETS, getCourseById } from '../config/courseConfig.js';
 import { getCharacterById } from '../data/characterFactory.js';
-import { buildTerrainAffinity, getTerrainLabel, getTerrainRank } from '../utils/terrainUtils.js';
+import { buildTerrainAffinity, getTerrainRank } from '../utils/terrainUtils.js';
 
-class TitleScene {
+export class TitleScene {
   constructor(game) {
     this.game = game;
     this.uiRoot = game.uiRoot;
@@ -28,101 +27,104 @@ class TitleScene {
   update() {}
 
   render(renderer) {
-    const { ctx, canvas } = renderer;
     renderer.drawBackgroundSky();
+    this.drawTitleBackdrop(renderer);
+  }
 
-    ctx.fillStyle = '#d2f5ff';
+  drawTitleBackdrop(renderer) {
+    const { ctx, canvas } = renderer;
+    const baseY = 360;
+
+    ctx.fillStyle = '#d9f7ff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = '#ffffff';
-    [110, 320, 620, 820].forEach((x, index) => {
-      const y = 90 + (index % 2) * 28;
+    ctx.fillStyle = '#bdefff';
+    ctx.beginPath();
+    ctx.arc(170, 110, 42, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    [
+      [170, 120, 120],
+      [260, 140, 110],
+      [720, 110, 130],
+      [820, 138, 112],
+    ].forEach(([x, y, w]) => {
       ctx.beginPath();
-      ctx.ellipse(x, y, 64, 22, 0, 0, Math.PI * 2);
-      ctx.ellipse(x + 36, y + 6, 46, 18, 0, 0, Math.PI * 2);
-      ctx.ellipse(x - 28, y + 6, 40, 16, 0, 0, Math.PI * 2);
+      ctx.ellipse(x, y, w, 34, 0, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    ctx.fillStyle = '#9ed772';
-    ctx.fillRect(0, 292, canvas.width, 88);
-    ctx.fillStyle = '#cfab76';
-    ctx.fillRect(0, 380, canvas.width, 70);
-    ctx.fillStyle = '#f7e9b8';
-    for (let x = 0; x < canvas.width; x += 18) {
-      ctx.fillRect(x, 404, 8, 4);
-    }
+    ctx.fillStyle = '#a2d58e';
+    ctx.beginPath();
+    ctx.moveTo(0, baseY);
+    ctx.quadraticCurveTo(180, 310, 360, 360);
+    ctx.quadraticCurveTo(520, 405, 690, 348);
+    ctx.quadraticCurveTo(780, 320, canvas.width, 362);
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.lineTo(0, canvas.height);
+    ctx.closePath();
+    ctx.fill();
 
-    ctx.fillStyle = '#28455a';
+    ctx.fillStyle = '#8cc97a';
+    ctx.fillRect(0, baseY, canvas.width, canvas.height - baseY);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.88)';
     ctx.font = 'bold 54px sans-serif';
-    ctx.fillText('Seal Sprint 2D', 62, 116);
-    ctx.font = '24px sans-serif';
-    ctx.fillStyle = '#3d6783';
-    ctx.fillText('横スクロール・スタミナ配分型レース試作', 64, 154);
+    ctx.fillText('Seal Sprint', 74, 122);
+    ctx.font = '22px sans-serif';
+    ctx.fillStyle = '#2e617e';
+    ctx.fillText('もんすたぁレース風・1体プレイ試作', 78, 160);
+
+    ctx.fillStyle = 'rgba(46, 97, 126, 0.12)';
+    ctx.fillRect(70, 220, 820, 140);
 
     const previewRunner = getCharacterById(this.game.state.selectedCharacterId);
-    renderer.drawSealPlaceholder(126, 286, 220, 132, previewRunner.colorType, previewRunner.displayName, false);
-    renderer.drawSealPlaceholder(398, 300, 188, 116, '#ffad72', 'CPU', true);
-    renderer.drawSealPlaceholder(648, 290, 210, 128, '#72d0bc', 'GOAL', false);
+    const color = previewRunner.colorType;
+    renderer.drawSealPlaceholder(110, 245, 200, 130, color, previewRunner.displayName, false);
+    renderer.drawSealPlaceholder(360, 235, 220, 140, '#ffaf80', 'れーす', true);
+    renderer.drawSealPlaceholder(640, 255, 190, 120, '#8fd3c8', 'ごーる', false);
   }
 
   renderUI() {
     const selectedCharacter = getCharacterById(this.game.state.selectedCharacterId);
-    const selectedCourse = getCourseById(this.game.state.selectedCourseId);
     const terrainAffinity = buildTerrainAffinity(selectedCharacter);
 
-    const characterCards = CHARACTER_CONFIG.map((character) => {
+    const cards = CHARACTER_CONFIG.map((character) => {
       const isSelected = character.id === selectedCharacter.id;
       return `
         <button class="character-card ${isSelected ? 'is-selected' : ''}" data-character-id="${character.id}">
           <h3>${character.displayName}</h3>
           <p>${character.description}</p>
           <div class="tag-row">
+            <span class="tag-pill">${character.type}</span>
             <span class="tag-pill">Base ${character.baseSpeed}</span>
-            <span class="tag-pill">Stamina ${character.staminaMax}</span>
           </div>
         </button>
       `;
     }).join('');
 
-    const courseCards = COURSE_PRESETS.map((course) => {
-      const isSelected = course.id === selectedCourse.id;
-      return `
-        <button class="character-card ${isSelected ? 'is-selected' : ''}" data-course-id="${course.id}">
-          <h3>${course.displayName}</h3>
-          <p>${course.summary}</p>
-          <div class="tag-row">
-            <span class="tag-pill">距離 ${course.totalDistance}m</span>
-            <span class="tag-pill">目安 ${course.par}s</span>
-          </div>
-        </button>
-      `;
-    }).join('');
-
-    const rankRows = ['grass', 'dirt', 'flat'].map((terrain) => `
+    const rankRows = ['grass', 'sand', 'water'].map((terrain) => `
       <div class="rank-row">
-        <span>${getTerrainLabel(terrain)}</span>
-        <span class="rank-pill">${getTerrainRank(terrainAffinity[terrain] ?? 1)}</span>
+        <span>${this.getTerrainLabel(terrain)}</span>
+        <span class="rank-pill">${getTerrainRank(terrainAffinity[terrain])}</span>
       </div>
     `).join('');
 
     this.uiRoot.innerHTML = `
-      <span class="kicker">Title / Setup</span>
-      <h2 class="panel-title">出走設定</h2>
-      <p class="inline-note">1体を操作し、CPU 4 体と横スクロールのレースを走ります。勝負の中心はスタミナ配分です。</p>
+      <span class="kicker">Title / Select</span>
+      <h2 class="panel-title">走るあざらしを選ぶ</h2>
+      <p class="inline-note">今回は 1 体だけで出走します。違いが分かりやすい 3 体から選んでください。</p>
 
       <div class="section-label">Character</div>
-      <div class="card-list">${characterCards}</div>
-
-      <div class="section-label">Course</div>
-      <div class="card-list">${courseCards}</div>
+      <div class="card-list">${cards}</div>
 
       <div class="section-label">Selected Info</div>
       <div class="info-card">
         <h3>${selectedCharacter.displayName}</h3>
         <p>${selectedCharacter.description}</p>
         <div class="tag-row">
-          <span class="tag-pill">${selectedCourse.displayName}</span>
+          <span class="tag-pill">タイプ: ${selectedCharacter.type}</span>
           <span class="tag-pill">ダッシュ x${selectedCharacter.dashMultiplier.toFixed(2)}</span>
         </div>
         <div class="section-label">Terrain Rank</div>
@@ -146,18 +148,16 @@ class TitleScene {
       });
     });
 
-    this.uiRoot.querySelectorAll('[data-course-id]').forEach((button) => {
-      button.addEventListener('click', () => {
-        this.game.state.selectedCourseId = button.dataset.courseId;
-        this.renderUI();
-      });
-    });
-
     this.uiRoot.querySelector('#start-race-button')?.addEventListener('click', () => {
       this.game.startRace();
     });
   }
-}
 
-export { TitleScene };
-export default TitleScene;
+  getTerrainLabel(terrain) {
+    return {
+      grass: 'Grass',
+      sand: 'Sand',
+      water: 'Water',
+    }[terrain] ?? terrain;
+  }
+}

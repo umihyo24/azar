@@ -14,30 +14,20 @@ export function formatPercent(value, decimals = 0) {
   return `${(value * 100).toFixed(decimals)}%`;
 }
 
-export function formatDistance(value) {
-  return `${Math.max(0, value).toFixed(0)}m`;
+export function getResultEvaluation(timeSeconds) {
+  if (timeSeconds <= 21.5) {
+    return 'Excellent! 波に乗った快走でした。';
+  }
+  if (timeSeconds <= 24.5) {
+    return 'Great! 安定して気持ちよく走れました。';
+  }
+  if (timeSeconds <= 28) {
+    return 'Good! ダッシュの入れどころが見えてきました。';
+  }
+  return 'Nice Try! コースに合わせて温存するともっと伸びます。';
 }
 
-export function formatGap(value) {
-  if (Math.abs(value) < 10) {
-    return `${value >= 0 ? '+' : ''}${value.toFixed(1)}m`;
-  }
-  return `${value >= 0 ? '+' : ''}${value.toFixed(0)}m`;
-}
-
-export function getPlacementLabel(place) {
-  return `${place}位`;
-}
-
-export function getResultEvaluation(place, finishTime, staminaLeftRatio) {
-  if (place === 1 && staminaLeftRatio > 0.16) {
-    return `Excellent! 配分勝ちです。${finishTime.toFixed(2)} 秒で押し切りました。`;
-  }
-  if (place <= 2) {
-    return 'Great! 終盤の踏みどころが良く、しっかり勝負できました。';
-  }
-  if (place <= 3) {
-    return 'Good! 温存と仕掛けのバランスは悪くありません。';
-  }
-  return 'Nice Try! 終盤まで少しスタミナを残すと順位が伸びやすいです。';
+export function toSignedDelta(value) {
+  const rounded = value >= 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
+  return rounded;
 }

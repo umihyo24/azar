@@ -35,13 +35,3 @@ export function getSegmentForDistance(course, distance) {
 export function getTerrainAffinityForSegment(terrainAffinity, terrain) {
   return terrainAffinity[terrain] ?? 1;
 }
-
-export function getTerrainLabel(terrain) {
-  return {
-    grass: 'Grass',
-    dirt: 'Dirt',
-    flat: 'Flat',
-    sand: 'Sand',
-    water: 'Water',
-  }[terrain] ?? terrain;
-}

@@ -7,13 +7,12 @@
  * - サウンド、永続セーブ、ローディング、グローバル難易度設定の追加。
  */
 import { GAME_CONFIG } from './config/gameConfig.js';
-import { DEFAULT_COURSE_ID } from './config/courseConfig.js';
 import { Renderer } from './renderer.js';
 import { InputController } from './input.js';
 import { SceneManager } from './sceneManager.js';
-import TitleScene from './scenes/TitleScene.js';
-import RaceScene from './scenes/RaceScene.js';
-import ResultScene from './scenes/ResultScene.js';
+import { TitleScene } from './scenes/TitleScene.js';
+import { RaceScene } from './scenes/RaceScene.js';
+import { ResultScene } from './scenes/ResultScene.js';
 
 export class Game {
   constructor({ canvas, uiRoot }) {
@@ -24,7 +23,6 @@ export class Game {
     this.sceneManager = new SceneManager(this);
     this.state = {
       selectedCharacterId: 'normal',
-      selectedCourseId: DEFAULT_COURSE_ID,
       lastResult: null,
       activeRunnerId: 'normal',
     };

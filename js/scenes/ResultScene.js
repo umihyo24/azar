@@ -4,11 +4,11 @@
  * 依存している config / module:
  * - formatters.js と game.js の state。
  * 将来どこを拡張する想定か:
- * - 詳細ラップ、ライバル履歴、リプレイ、報酬表示の追加。
+ * - ランキング、リプレイ、獲得報酬、複数 runner の順位表示追加。
  */
-import { formatSeconds, getPlacementLabel, getResultEvaluation } from '../utils/formatters.js';
+import { formatSeconds, getResultEvaluation } from '../utils/formatters.js';
 
-class ResultScene {
+export class ResultScene {
   constructor(game) {
     this.game = game;
     this.uiRoot = game.uiRoot;
@@ -27,37 +27,43 @@ class ResultScene {
   render(renderer) {
     renderer.drawBackgroundSky();
     const { ctx, canvas } = renderer;
-    const result = this.game.state.lastResult;
 
-    ctx.fillStyle = '#e6f7ff';
+    ctx.fillStyle = '#f0fbff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#9cd873';
-    ctx.fillRect(0, 320, canvas.width, 90);
-    ctx.fillStyle = '#d3af79';
-    ctx.fillRect(0, 410, canvas.width, 130);
 
-    ctx.fillStyle = '#21445a';
+    ctx.fillStyle = 'rgba(73, 166, 255, 0.12)';
+    ctx.fillRect(96, 86, canvas.width - 192, canvas.height - 172);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(124, 112, canvas.width - 248, canvas.height - 224);
+
+    ctx.fillStyle = '#2c536b';
     ctx.font = 'bold 44px sans-serif';
-    ctx.fillText('Race Result', 308, 118);
-    ctx.font = '22px sans-serif';
-    ctx.fillStyle = '#416b84';
-    ctx.fillText(`${result.courseName} / ${getPlacementLabel(result.finishPlace)}`, 316, 162);
+    ctx.fillText('Race Result', 324, 170);
 
-    renderer.drawSealPlaceholder(338, 240, 260, 148, '#78c8ff', result.displayName, result.finishPlace <= 2);
+    const result = this.game.state.lastResult;
+    ctx.font = '24px sans-serif';
+    ctx.fillStyle = '#4f6e80';
+    ctx.fillText(`Runner: ${result?.displayName ?? '-'}`, 280, 244);
+    ctx.fillText(`Time: ${result ? formatSeconds(result.finishTime, 2) : '-'}`, 280, 290);
+
+    ctx.fillStyle = '#67b77b';
+    ctx.font = 'bold 28px sans-serif';
+    ctx.fillText(result ? getResultEvaluation(result.finishTime) : '', 174, 356);
+
+    renderer.drawSealPlaceholder(360, 360, 240, 140, '#7cc8ff', result?.displayName ?? 'seal', true);
   }
 
   renderUI() {
     const result = this.game.state.lastResult;
-    const evaluation = getResultEvaluation(result.finishPlace, result.finishTime, result.staminaLeftRatio);
+    const evaluation = result ? getResultEvaluation(result.finishTime) : '---';
 
     this.uiRoot.innerHTML = `
       <span class="kicker">Result</span>
       <h2 class="panel-title">レース結果</h2>
       <div class="result-box">
-        <h3>${result.displayName}</h3>
-        <p>順位: <strong>${getPlacementLabel(result.finishPlace)}</strong></p>
-        <p>タイム: <strong>${formatSeconds(result.finishTime, 2)}</strong></p>
-        <p>コース: <strong>${result.courseName}</strong></p>
+        <h3>${result?.displayName ?? 'No Runner'}</h3>
+        <p>クリアタイム: <strong>${result ? formatSeconds(result.finishTime, 2) : '--'}</strong></p>
         <p>評価: ${evaluation}</p>
       </div>
       <div class="result-actions">
@@ -75,6 +81,3 @@ class ResultScene {
     });
   }
 }
-
-export { ResultScene };
-export default ResultScene;

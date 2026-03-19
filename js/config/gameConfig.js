@@ -1,10 +1,10 @@
 /*
  * このファイルの責務:
- * - ゲーム全体で共有する描画サイズ・UI 基本値・レース係数を管理する。
+ * - ゲーム全体で共有する描画サイズ・レース時間感・UI 文言などの基本設定を管理する。
  * 依存している config / module:
  * - なし。各 scene や renderer から参照される。
  * 将来どこを拡張する想定か:
- * - 難易度、サウンド、画面サイズ切り替え、演出係数の調整。
+ * - 難易度別設定、音量、複数コース、複数 runner 用の共通係数追加。
  */
 export const GAME_CONFIG = {
   canvas: {
@@ -12,31 +12,37 @@ export const GAME_CONFIG = {
     height: 540,
   },
   race: {
-    maxFinishers: 5,
-    lowStaminaThreshold: 0.28,
-    exhaustedThreshold: 0.1,
-    zeroStaminaSpeedFactor: 0.46,
-    baseRecoveryRate: 1.4,
-    catchupDistance: 120,
-    finishBurstDistance: 260,
-    cameraShakeAtFinish: 0.85,
+    distance: 1380,
+    timeLimitSeconds: 35,
+    dashDrainMultiplier: 2.45,
+    lowStaminaThreshold: 0.22,
+    exhaustedThreshold: 0.08,
+    minSpeedFactorAtZeroStamina: 0.72,
+    recoveryDelaySeconds: 0.3,
+    terrainDrainImpact: 0.22,
+    dashSpeedPulse: 0.05,
+    laneY: 356,
   },
   ui: {
-    raceTitle: '2D ペース配分レース',
+    raceTitle: 'ゆるっとシーサイドレース',
+    progressDecimals: 0,
     timeDecimals: 2,
-    gapDecimals: 1,
   },
   visuals: {
     bob: {
-      baseAmplitude: 4,
-      fastAmplitude: 7,
+      baseAmplitude: 5,
+      dashAmplitude: 9,
       tiredAmplitude: 2,
-      baseFrequency: 7.2,
+      baseFrequency: 4.8,
     },
-    pixel: {
-      laneStripeWidth: 18,
-      tileWidth: 48,
-      fenceSpan: 32,
+    speedLines: {
+      count: 10,
+      length: 28,
+      dashBoost: 1.8,
+    },
+    parallax: {
+      cloudSpeed: 20,
+      hillSpeed: 55,
     },
   },
 };

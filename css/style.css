@@ -215,11 +215,6 @@ input {
   font-weight: 700;
 }
 
-.secondary-button.is-selected {
-  background: linear-gradient(180deg, #63c3ff 0%, #2c84dd 100%);
-  color: #ffffff;
-}
-
 .primary-button:hover,
 .secondary-button:hover,
 .dash-button:hover,
