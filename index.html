@@ -1,0 +1,59 @@
+<!--
+  プロジェクトの目的:
+  - Canvas ベースで動く「もんすたぁレース風」の最小試作を作り、1体のプレイヤーランナーで
+    気持ちよく走る体験と将来拡張しやすい構造を両立する。
+
+  画面一覧:
+  - タイトル / キャラ選択画面
+  - レース画面
+  - リザルト画面
+
+  ファイル / フォルダごとの役割:
+  - /css/style.css: 画面全体のレイアウトと UI スタイル
+  - /js/main.js: アプリ起動
+  - /js/game.js: Game オブジェクト初期化と共有状態の管理
+  - /js/renderer.js: Canvas 描画の共通処理
+  - /js/input.js: マウス / タッチ入力の集約
+  - /js/sceneManager.js: Scene の切り替え管理
+  - /js/config: 調整値・キャラ性能・タイプ傾向・コース定義
+  - /js/data/characterFactory.js: config からプレイヤー用ランナー生成
+  - /js/utils: 地形適性や表示整形などの補助関数
+  - /js/scenes: Title / Race / Result の各画面ロジック
+  - /assets: 将来差し替える画像や UI 素材置き場
+
+  データの流れ:
+  - main.js -> game.js でゲーム生成
+  - TitleScene が characterConfig と typeConfig を使って選択 UI を表示
+  - RaceScene が characterFactory と courseConfig を使ってランナーを生成・進行
+  - ResultScene が RaceScene の結果を受け取って再挑戦やタイトル戻りを処理
+
+  今回未実装で将来拡張予定の要素:
+  - CPU
+  - 複数ランナー
+  - 交代
+  - 育成
+-->
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seal Sprint Prototype</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <h1>Seal Sprint Prototype</h1>
+        <p>1体で遊べる、ゆるいレース試作。</p>
+      </header>
+      <main class="game-layout">
+        <section class="canvas-panel">
+          <canvas id="game-canvas" width="960" height="540" aria-label="game canvas"></canvas>
+        </section>
+        <aside class="ui-panel" id="ui-root"></aside>
+      </main>
+    </div>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
